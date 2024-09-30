@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matrix Rain with Coming Soon</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+            background-color: black;
+        }
+        canvas {
+            display: block;
+        }
+        .welcome-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: monospace;
+            font-size: 40px;
+            color: #0F0;
+            animation: flicker 2s infinite;
+            opacity: 1;
+            transition: opacity 2s ease-out; /* Transition for smooth fading */
+        }
+        .coming-soon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: monospace;
+            font-size: 50px;
+            color: #fff;
+            opacity: 0;
+            transition: opacity 3s ease-in; /* Smooth appear for Coming Soon text */
+        }
+        @keyframes flicker {
+            0% { opacity: 0.1; }
+            50% { opacity: 1; }
+            100% { opacity: 0.1; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="matrixCanvas"></canvas>
+    <div class="welcome-text" id="welcomeText">welcome to xuejun.link</div> <!-- The flickering text -->
+    <div class="coming-soon" id="comingSoon">Coming Soon</div> <!-- Coming Soon text -->
+
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
+    <script>
+        const canvas = document.getElementById('matrixCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function updateCanvasSize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        updateCanvasSize();
+
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%^&*()_+-=[]{}|;:,.<>?';
+        const columns = Math.floor(canvas.width / 20);
+        const drops = Array(columns).fill(1);
+        let stopNewChars = false; // To control when new characters stop falling
+
+        function draw() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#0F0';
+            ctx.font = '15px monospace';
+
+            for (let i = 0; i < drops.length; i++) {
+                const text = chars[Math.floor(Math.random() * chars.length)];
+                ctx.fillText(text, i * 20, drops[i] * 20);
+
+                // Stop generating new characters after 8 seconds
+                if (!stopNewChars) {
+                    if (drops[i] * 20 > canvas.height && Math.random() > 0.975) {
+                        drops[i] = 0;
+                    }
+                }
+
+                drops[i]++;
+            }
+        }
+
+        function animate() {
+            draw();
+            requestAnimationFrame(animate);
+        }
+
+        window.addEventListener('resize', updateCanvasSize);
+
+        // Start matrix rain effect
+        requestAnimationFrame(animate);
+
+        // Fade out welcome text at 7 seconds
+        setTimeout(() => {
+            const welcomeText = document.getElementById("welcomeText");
+            welcomeText.style.opacity = 0;
+
+            // After opacity transition, hide the text completely
+            setTimeout(() => {
+                welcomeText.style.display = "none";
+            }, 2000); // Wait for the opacity transition to complete (2 seconds)
+
+        }, 7000);
+
+        // Stop generating new characters after 8 seconds
+        setTimeout(() => {
+            stopNewChars = true; // Stop generating new characters
+        }, 8000);
+
+        // Fireworks effect with two types
+        function displayFireworks() {
+            // Type 1: Big Explosion
+            confetti({
+                particleCount: 300, // Big explosion
+                startVelocity: 50, 
+                spread: 360,
+                ticks: 100,
+                gravity: 0.7,
+                origin: {
+                    x: Math.random(),
+                    y: Math.random() - 0.2
+                },
+                colors: ['#ff0', '#ff6347', '#adff2f', '#7fff00']
+            });
+
+            // Type 2: Smaller bursts but more frequent
+            confetti({
+                particleCount: 100,
+                startVelocity: 60, 
+                spread: 80, 
+                ticks: 150,
+                gravity: 0.9,
+                origin: {
+                    x: Math.random(),
+                    y: Math.random() - 0.2
+                },
+                colors: ['#00ced1', '#ffa07a', '#ffd700', '#da70d6']
+            });
+
+            // Repeat the fireworks every 1.5 seconds
+            setTimeout(displayFireworks, 1500);
+        }
+
+        // Start the fireworks effect after 9 seconds
+        setTimeout(() => {
+            displayFireworks();
+        }, 9000);
+
+        // Show "Coming Soon" after the fireworks starts (around 11 seconds)
+        setTimeout(() => {
+            document.getElementById("comingSoon").style.opacity = 1;
+        }, 11000);
+    </script>
+</body>
+</html>
